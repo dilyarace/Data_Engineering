@@ -69,6 +69,51 @@ Key = 4 × 11 × 3 × ... (repeated for all 64 characters)
 Adding 1 prevents the product from becoming zero when a character is `"0"`.
 
 
+
+## Solution
+
+```python
+import hashlib
+import os
+
+# Configuration
+data_dir = "./task2"
+email    = "dilyarace@gmail.com"
+
+# Step 1: Read exactly 256 .data files
+files = sorted(f for f in os.listdir(data_dir) if f.endswith(".data"))
+print(f"Files found: {len(files)}")  # must be 256
+
+# Step 2: Compute SHA3-256 hash for each file
+hashes = []
+for fname in files:
+    path = os.path.join(data_dir, fname)
+    with open(path, "rb") as f:
+        data = f.read()
+    h = hashlib.sha3_256(data).hexdigest()
+    hashes.append(h)
+
+# Step 3: Sort by custom key — product of (hex_digit + 1)
+def sort_key(h):
+    product = 1
+    for c in h:
+        product *= (int(c, 16) + 1)
+    return product
+
+hashes_sorted = sorted(hashes, key=sort_key)
+
+# Step 4: Concatenate without separator
+joined = "".join(hashes_sorted)
+
+# Step 5: Append email
+final_str = joined + email
+
+# Step 6: Final SHA3-256
+result = hashlib.sha3_256(final_str.encode("utf-8")).hexdigest()
+print(f"Result: {result}")
+```
+
+
 ## Pipeline Overview
 
 ```
@@ -106,3 +151,26 @@ single string (16,384 + len(email) characters)
 
 - **Language:** Python 3
 - **Libraries:** `hashlib` (built-in), `os` (built-in) — no external dependencies
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
